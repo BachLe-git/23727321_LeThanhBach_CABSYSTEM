@@ -1,0 +1,178 @@
+openapi: 3.0.0
+info:
+  title: Driver Management API
+  description: "API for managing driver candidates, ranking, assignment, and handling driver responses"
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /drivers/candidates:
+    get:
+      summary: Find candidate drivers
+      operationId: findCandidateDrivers
+      responses:
+        "200":
+          description: List of candidate drivers found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Driver"
+  /drivers/ranking:
+    get:
+      summary: Get ranking of drivers
+      operationId: rankDrivers
+      responses:
+        "200":
+          description: Ranked list of drivers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DriverRanking"
+  /drivers/assign:
+    post:
+      summary: Assign a driver
+      operationId: assignDriver
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                driverId:
+                  type: string
+                orderId:
+                  type: string
+        required: true
+      responses:
+        "200":
+          description: Driver assigned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssignmentResult"
+  /drivers/reject:
+    post:
+      summary: Handle driver rejection
+      operationId: handleDriverReject
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                driverId:
+                  type: string
+                orderId:
+                  type: string
+                reason:
+                  type: string
+        required: true
+      responses:
+        "200":
+          description: Driver rejection processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RejectResult"
+  /drivers/timeout:
+    post:
+      summary: Handle driver timeout
+      operationId: handleDriverTimeout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                driverId:
+                  type: string
+                orderId:
+                  type: string
+        required: true
+      responses:
+        "200":
+          description: Driver timeout processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimeoutResult"
+  /drivers/match/continue:
+    post:
+      summary: Continue matching other drivers
+      operationId: continueMatchingOtherDrivers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId:
+                  type: string
+        required: true
+      responses:
+        "200":
+          description: Continued matching other drivers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MatchResult"
+components:
+  schemas:
+    Driver:
+      type: object
+      properties:
+        driverId:
+          type: string
+        name:
+          type: string
+        rating:
+          type: number
+          format: float
+      description: Candidate driver information
+    DriverRanking:
+      type: object
+      properties:
+        driverId:
+          type: string
+        rank:
+          type: integer
+        score:
+          type: number
+          format: float
+      description: Driver ranking details
+    AssignmentResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      description: Result of driver assignment
+    RejectResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      description: Result of driver rejection handling
+    TimeoutResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      description: Result of driver timeout handling
+    MatchResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      description: Result of continuing driver matching
