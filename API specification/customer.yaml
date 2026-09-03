@@ -1,0 +1,219 @@
+openapi: 3.0.0
+info:
+  title: Customer Booking and Trip API
+  description: "API for customer account management, booking, and trip tracking"
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /register:
+    post:
+      summary: Customer đăng ký tài khoản
+      operationId: registerCustomer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                email:
+                  type: string
+        required: true
+      responses:
+        "200":
+          description: Customer registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+  /login:
+    post:
+      summary: Customer đăng nhập
+      operationId: loginCustomer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+        required: true
+      responses:
+        "200":
+          description: Customer logged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+  /profile:
+    get:
+      summary: Customer quản lý Profile - get profile details
+      operationId: getCustomerProfile
+      responses:
+        "200":
+          description: Customer profile details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerProfile"
+    put:
+      summary: Customer quản lý Profile - update profile details
+      operationId: updateCustomerProfile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                phone:
+                  type: string
+                address:
+                  type: string
+        required: true
+      responses:
+        "200":
+          description: Customer profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerProfile"
+  /booking:
+    post:
+      summary: Customer tạo Booking
+      operationId: createBooking
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tripId:
+                  type: integer
+                pickupLocation:
+                  type: string
+                dropoffLocation:
+                  type: string
+                scheduledTime:
+                  type: string
+                  format: date-time
+        required: true
+      responses:
+        "201":
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+  /trip/status:
+    get:
+      summary: Customer xem Trip Status
+      operationId: getTripStatus
+      parameters:
+      - name: tripId
+        in: query
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Trip status information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TripStatus"
+  /trip/driver-location:
+    get:
+      summary: Customer xem Driver Location
+      operationId: getDriverLocation
+      parameters:
+      - name: tripId
+        in: query
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Driver location information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DriverLocation"
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        customerId:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+      description: A registered customer
+    CustomerProfile:
+      type: object
+      properties:
+        customerId:
+          type: integer
+        fullName:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+      description: Customer profile details
+    Booking:
+      type: object
+      properties:
+        bookingId:
+          type: integer
+        tripId:
+          type: integer
+        pickupLocation:
+          type: string
+        dropoffLocation:
+          type: string
+        scheduledTime:
+          type: string
+          format: date-time
+        status:
+          type: string
+      description: Booking details
+    TripStatus:
+      type: object
+      properties:
+        tripId:
+          type: integer
+        status:
+          type: string
+        estimatedArrival:
+          type: string
+          format: date-time
+      description: Status of a trip
+    DriverLocation:
+      type: object
+      properties:
+        tripId:
+          type: integer
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+        timestamp:
+          type: string
+          format: date-time
+      description: Driver's current location
