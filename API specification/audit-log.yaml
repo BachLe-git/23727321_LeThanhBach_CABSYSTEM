@@ -1,0 +1,248 @@
+openapi: 3.0.0
+info:
+  title: CAB System Customer API
+  description: API for managing customers in the CAB System
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /customers/register:
+    post:
+      summary: Register a new customer
+      operationId: registerCustomer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerRegisterRequest"
+            examples:
+              example1:
+                value:
+                  name: John Doe
+                  phone: "+1234567890"
+                  email: john.doe@example.com
+                  password: strongPassword123
+                  status: active
+        required: true
+      responses:
+        "201":
+          description: Customer registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+              examples:
+                example1:
+                  value:
+                    customerId: 12345
+                    name: John Doe
+                    phone: "+1234567890"
+                    email: john.doe@example.com
+                    status: active
+        "400":
+          description: Invalid input
+  /customers/login:
+    post:
+      summary: Customer login
+      operationId: loginCustomer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerLoginRequest"
+            examples:
+              example1:
+                value:
+                  email: john.doe@example.com
+                  password: strongPassword123
+        required: true
+      responses:
+        "200":
+          description: Customer logged in successfully
+          content:
+            application/json:
+              schema:
+                required:
+                - customerId
+                - message
+                type: object
+                properties:
+                  message:
+                    type: string
+                  customerId:
+                    oneOf:
+                    - type: integer
+                    - type: string
+              examples:
+                example1:
+                  value:
+                    message: Login successful
+                    customerId: 12345
+        "401":
+          description: Unauthorized - invalid credentials
+  /customers/{customerId}:
+    get:
+      summary: Get customer information
+      operationId: getCustomerById
+      parameters:
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          oneOf:
+          - type: integer
+          - type: string
+      responses:
+        "200":
+          description: Customer information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+              examples:
+                example1:
+                  value:
+                    customerId: 12345
+                    name: John Doe
+                    phone: "+1234567890"
+                    email: john.doe@example.com
+                    status: active
+        "404":
+          description: Customer not found
+    put:
+      summary: Update customer profile
+      operationId: updateCustomer
+      parameters:
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          oneOf:
+          - type: integer
+          - type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerUpdateRequest"
+            examples:
+              example1:
+                value:
+                  name: John Doe Updated
+                  phone: "+1987654321"
+                  email: john.updated@example.com
+                  status: inactive
+        required: true
+      responses:
+        "200":
+          description: Customer profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerResponse"
+              examples:
+                example1:
+                  value:
+                    customerId: 12345
+                    name: John Doe Updated
+                    phone: "+1987654321"
+                    email: john.updated@example.com
+                    status: inactive
+        "400":
+          description: Invalid input
+        "404":
+          description: Customer not found
+    delete:
+      summary: Delete or deactivate a customer
+      operationId: deleteCustomer
+      parameters:
+      - name: customerId
+        in: path
+        required: true
+        schema:
+          oneOf:
+          - type: integer
+          - type: string
+      responses:
+        "204":
+          description: Customer deleted/deactivated successfully
+        "404":
+          description: Customer not found
+components:
+  schemas:
+    CustomerBase:
+      required:
+      - email
+      - name
+      - phone
+      - status
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+        status:
+          type: string
+    CustomerRegisterRequest:
+      allOf:
+      - $ref: "#/components/schemas/CustomerBase"
+      - required:
+        - password
+        type: object
+        properties:
+          password:
+            type: string
+    CustomerLoginRequest:
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    CustomerUpdateRequest:
+      required:
+      - email
+      - name
+      - phone
+      - status
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+        status:
+          type: string
+    CustomerResponse:
+      required:
+      - customerId
+      - email
+      - name
+      - phone
+      - status
+      type: object
+      properties:
+        customerId:
+          oneOf:
+          - type: integer
+          - type: string
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+        status:
+          type: string
